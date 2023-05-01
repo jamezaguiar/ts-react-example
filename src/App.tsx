@@ -4,12 +4,15 @@ import { getUsers } from './api/usersAPI';
 import { Button } from './components/Button';
 import { List } from './components/List';
 import { Title } from './components/Title';
+import { usePostsContext } from './context/postsContext/usePostsContext';
 import { IUser } from './types/userTypes';
 import { sortByKey } from './utils/arrayUtils';
 
 function App() {
   const [users, setUsers] = useState<IUser[]>([]);
   const [isLoadingUsers, setIsLoadingUsers] = useState(false);
+
+  const { getUserPosts, isLoadingPosts } = usePostsContext();
 
   useEffect(() => {
     setIsLoadingUsers(true);
@@ -20,7 +23,7 @@ function App() {
   }, []);
 
   function handleDeleteUser(id: number) {
-    setUsers(prevUsers => prevUsers.filter(u => u.id !== id));
+    setUsers(prevUsers => prevUsers.filter(user => user.id !== id));
   }
 
   const sortedItems = useMemo(() => {
@@ -38,13 +41,14 @@ function App() {
           render={(user, index) => {
             let userName: ReactNode;
             if (index % 2 === 0) {
-              userName = <p key={user.id}>{user.name}</p>;
+              userName = <p>{user.name}</p>;
             } else {
-              userName = <h3 key={user.id}>{user.name}</h3>;
+              userName = <h3>{user.name}</h3>;
             }
 
             return (
               <div
+                key={user.id}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -52,6 +56,9 @@ function App() {
                 }}
               >
                 {userName}{' '}
+                {isLoadingPosts
+                  ? 'loading posts...'
+                  : `has ${getUserPosts(user.id).length} posts`}{' '}
                 <Button
                   variant="danger"
                   onClick={() => handleDeleteUser(user.id)}
