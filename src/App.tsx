@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useState } from 'react';
+import { ReactNode, useEffect, useMemo, useState } from 'react';
 import './App.css';
 import { getUsers } from './api/usersAPI';
 import { Button } from './components/Button';
@@ -23,6 +23,10 @@ function App() {
     setUsers(prevUsers => prevUsers.filter(u => u.id !== id));
   }
 
+  const sortedItems = useMemo(() => {
+    return sortByKey(users, 'name', 'DESC');
+  }, [users]);
+
   return (
     <div className="App">
       <Title>Users</Title>
@@ -30,7 +34,7 @@ function App() {
         <p>loading...</p>
       ) : (
         <List
-          items={sortByKey(users, 'name', 'DESC')}
+          items={sortedItems}
           render={(user, index) => {
             let userName: ReactNode;
             if (index % 2 === 0) {
